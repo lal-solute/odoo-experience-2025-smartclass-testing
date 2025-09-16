@@ -1,0 +1,98 @@
+import { expect, test } from "@odoo/hoot";
+import { formatHumanReadable } from "../src/js/formatters";
+import {
+    contains,
+    defineModels,
+    fields,
+    models,
+    mountView,
+    onRpc,
+} from "@web/../tests/web_test_helpers";
+
+class Volume extends models.Model {
+    _name = "smartclass.volume";
+    name = fields.Char({ string: "Name" });
+    depth = fields.Float({ string: "Depth (m)" });
+    width = fields.Float({ string: "Width (m)" });
+    height = fields.Float({ string: "Height (m)" });
+    volume = fields.Float({ string: "Volume (m³)", compute: "_compute_volume", store: true });
+    category = fields.Selection({
+        selection: [
+            ["small", "Small"],
+            ["medium", "Medium"],
+            ["large", "Large"],
+        ],
+        compute: "_compute_category",
+        store: true,
+    });
+    _records = [
+        { name: "Volume 1", id: 1, depth: 4, width: 5, height: 6 },
+        { name: "Volume 2", id: 2, depth: 10, width: 10, height: 10 },
+        { name: "Volume 3", id: 3, depth: 2.453, width: 1.4355, height: 6.4334 },
+    ];
+    _views = {
+        list: `<list editable="top" multi_edit="1" create="1">
+                <field name="width"/>
+                <field name="depth"/>
+                <field name="height"/>
+                <field name="volume" readonly="1" widget="human_readable_widget"/>
+                <field name="category" readonly="1"/>
+            </list>`,
+    };
+    _compute_volume() {
+        for (const record of this) {
+            record.volume = record.depth * record.height * record.width;
+        }
+    }
+    _compute_category() {
+        for (const record of this) {
+            record.category = "large";
+            if (record.volume <= 1) {
+                record.category = "small";
+            } else if (record.volume <= 100) {
+                record.category = "small";
+            }
+        }
+    }
+}
+
+defineModels([Volume]);
+
+// ===== TO AVOID GET =====
+// Error during test:
+// The following error occurred in onWillStart: "cannot find a definition for model "res.users":
+// could not get model from server environment (did you forget to use `defineModels()?`)"
+onRpc("has_group", () => true);
+
+test("formatHumanReadable function", () => {
+    // Write and test formatHumanReadable function for cases
+    // - false must be NaN
+    // - 6000 must be 6.00 k
+    // - 600000 mut be 6.00 M
+    // - 30000000000 must be 30.00 B
+    // - -3453456 must be -3.45 M
+    // - -3453.456 must be -3.45 k
+    // - -3453456.56789 must be -3.45 M
+    // You can use 
+    // expect(...).toBe(...);
+});
+
+test("human readable widget in list view", async () => {
+    await mountView({
+        type: "list",
+        resModel: "smartclass.volume",
+        resIds: [1, 2],
+    });
+    // Test widget in a mounted view
+    // 1. Check that values that are already present in list are corrects.
+    // 2. Click on create a new record
+    // 3. Fill inputs
+    // 4. Check that value in widget is correct
+    // 5. You can do it as much as you want ! Use your imagination.
+
+    // You can use 
+    // expect(...).toHaveText(...);
+    // expect(...).toHaveLength(...);
+    // await contains(selector).click();
+    // await contains(selector).edit();
+});
