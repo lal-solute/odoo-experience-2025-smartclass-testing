@@ -23,6 +23,10 @@ class Volume(models.Model):
 
     @api.depends("volume")
     def _compute_category(self):
-        #Adapt this function
         for rec in self:
-            rec.category = "small"
+            if rec.volume <= 1:
+                rec.category = "small"
+            elif rec.volume <= 100:
+                rec.category = "medium"
+            else:
+                rec.category = "large"
