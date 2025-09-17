@@ -80,16 +80,17 @@ test("human readable widget in list view", async () => {
         resModel: "smartclass.volume",
         resIds: [1, 2],
     });
-    // Test widget in a mounted view
-    // 1. Check that values that are already present in list are corrects.
-    // 2. Click on create a new record
-    // 3. Fill inputs
-    // 4. Check that value in widget is correct
-    // 5. You can do it as much as you want ! Use your imagination.
+    expect(`td[name=volume]:eq(0)`).toHaveText("120.00");
+    expect(`td[name=volume]:eq(1)`).toHaveText("1.00 k");
+    expect(`td[name=volume]:eq(2)`).toHaveText("22.65");
 
-    // You can use 
-    // expect(...).toHaveText(...);
-    // expect(...).toHaveLength(...);
-    // await contains(selector).click();
-    // await contains(selector).edit();
+    await contains(`td[name=width]:eq(0)`).click();
+    await contains(`td[name=width]:eq(0) input`).edit("43.43");
+    expect(`td[name=volume]:eq(0)`).toHaveText("1.04 k");
+    await contains(`td[name=depth]:eq(0)`).click();
+    await contains(`td[name=depth]:eq(0) input`).edit("43.43");
+    expect(`td[name=volume]:eq(0)`).toHaveText("11.32 k");
+    await contains(`td[name=height]:eq(0)`).click();
+    await contains(`td[name=height]:eq(0) input`).edit("43.43");
+    expect(`td[name=volume]:eq(0)`).toHaveText("81.92 k");
 });
