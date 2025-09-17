@@ -65,16 +65,13 @@ defineModels([Volume]);
 onRpc("has_group", () => true);
 
 test("formatHumanReadable function", () => {
-    // Write and test formatHumanReadable function for cases
-    // - false must be NaN
-    // - 6000 must be 6.00 k
-    // - 600000 mut be 6.00 M
-    // - 30000000000 must be 30.00 B
-    // - -3453456 must be -3.45 M
-    // - -3453.456 must be -3.45 k
-    // - -3453456.56789 must be -3.45 M
-    // You can use 
-    // expect(...).toBe(...);
+    expect(formatHumanReadable(false)).toBe("NaN");
+    expect(formatHumanReadable(6000)).toBe("6.00 k");
+    expect(formatHumanReadable(6000000)).toBe("6.00 M");
+    expect(formatHumanReadable(30000000000)).toBe("30.00 B");
+    expect(formatHumanReadable(-3453456)).toBe("-3.45 M");
+    expect(formatHumanReadable(-3453.456)).toBe("-3.45 k");
+    expect(formatHumanReadable(-3453456.56789)).toBe("-3.45 M");
 });
 
 test("human readable widget in list view", async () => {
